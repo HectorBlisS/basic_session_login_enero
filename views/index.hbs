@@ -1,2 +1,7 @@
 <h1>{{title}}</h1>
 <p>Welcome to {{title}}</p>
+{{#if admin}}
+<a href="/private">
+  <button>Admin dashboard</button>
+</a>
+{{/if}}

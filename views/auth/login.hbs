@@ -1,6 +1,10 @@
 <h2>Crea tu cuenta mijo!</h2>
 <p style="color:red"> {{error}} </p>
+{{#if next}}
+<form action="/login?next={{next}}" method="post">
+{{else}}
 <form action="/login" method="post">
+{{/if}}
   <p>
     Escribe tu correo
     <input name="email" type="email">

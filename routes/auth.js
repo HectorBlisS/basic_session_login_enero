@@ -4,6 +4,9 @@ let bcrypt = require('bcrypt')
 let passport = require('passport')
 let {isRole} = require('../helpers/middlewares')
 let {sendWelcomeMail} = require('../helpers/mailer')
+//config multer
+let multer = require('multer')
+let upload = multer({dest: './public/uploads'})
 
 //smart middleware
 // function isRole(role){
@@ -19,7 +22,7 @@ function isLoggedIn(req,res,next){
   if(req.isAuthenticated()){
     next()
   }else{
-    res.redirect('/login')
+    res.redirect('/login?next=' + req.path)
   }
 }
 
@@ -42,6 +45,24 @@ function isAuth(req,res,next){
   }
 }
 
+
+//profile 
+router.post('/profile',  
+  isLoggedIn, 
+  upload.single('cover'),
+  (req,res)=>{
+    if(req.file) req.body.cover = "/uploads/" + req.file.filename
+    User.findByIdAndUpdate(req.user._id, req.body)
+    .then(()=>{
+      res.redirect('/profile')
+    })
+})
+
+router.get('/profile', isLoggedIn, (req,res)=>{
+  console.log(req.user)
+  res.render('auth/profile', req.user)
+})
+
 router.get('/private', isLoggedIn, isRole('ADMIN'), (req,res)=>{
   res.render("index", {admin:true})
 })
@@ -56,13 +77,16 @@ router.get('/logout', (req,res)=>{
 router.get('/auth/callback/facebook/', 
   passport.authenticate('facebook',  { failureRedirect: '/login' }), 
   (req,res)=>{
-    res.json(req.user)
+    if(req.query.next) res.redirect(req.query.next)
+    else res.redirect('/')
 })
 router.get('/facebook/login', 
   passport.authenticate('facebook',{scope: ['email'] }))
 
 router.post('/login', passport.authenticate('local'), (req,res,next)=>{
-  res.json(req.user)
+  console.log(req.query)
+  if(req.query.next) res.redirect(req.query.next)
+  else res.redirect('/')
   //res.redirect('/profile')
 
 
@@ -84,7 +108,9 @@ router.post('/login', passport.authenticate('local'), (req,res,next)=>{
 })
 
 router.get('/login', isAuth, (req,res,next)=>{
-  res.render('auth/login')
+  let ctx = {}
+  if(req.query.next) ctx.next = req.query.next
+  res.render('auth/login', ctx)
 })
 
 router.post('/signup', (req,res,next)=>{

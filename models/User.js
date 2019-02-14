@@ -16,6 +16,7 @@ let userSchema = new Schema({
   email: String,
   facebookId:String,
   photoURL: String,
+  cover: String,
   //password: String
 },{timestamps:true})
 

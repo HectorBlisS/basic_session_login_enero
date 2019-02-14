@@ -5,8 +5,9 @@ let passport = require('passport')
 let {isRole} = require('../helpers/middlewares')
 let {sendWelcomeMail} = require('../helpers/mailer')
 //config multer
-let multer = require('multer')
-let upload = multer({dest: './public/uploads'})
+//let multer = require('multer')
+//let upload = multer({dest: './public/uploads'})
+let uploadCloud = require('../helpers/cloudinary')
 
 //smart middleware
 // function isRole(role){
@@ -49,9 +50,15 @@ function isAuth(req,res,next){
 //profile 
 router.post('/profile',  
   isLoggedIn, 
-  upload.single('cover'),
+  uploadCloud.fields([{name:"cover", maxCount:1}, {name:"photoURL", maxCount:1}]),
   (req,res)=>{
-    if(req.file) req.body.cover = "/uploads/" + req.file.filename
+    if(req.files.photoURL) {
+      //req.body.photoURL = "/uploads/" + req.files.photoURL[0].filename
+      req.body.photoURL = req.files.photoURL[0].url
+    }
+    if(req.files.cover) {
+      req.body.cover = req.files.cover[0].url
+    }
     User.findByIdAndUpdate(req.user._id, req.body)
     .then(()=>{
       res.redirect('/profile')

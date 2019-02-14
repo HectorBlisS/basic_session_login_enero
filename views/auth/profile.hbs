@@ -9,12 +9,19 @@
  <button id="coverEdit" >EDITAR</button>
   
   {{#if photoURL}}
-  <img src="{{photoURL}}" alt="{{username}}">
+  <div class="pic">
+    <div id="editPic">EDITAR</div>
+    <img src="{{photoURL}}" alt="{{username}}">
+  </div>
+  
   {{else}}
-  <img 
-    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQopX4_8IGscQTYwpSREOzeW8NHwcArkMkOl3Y1q_EBSiVNCftbvw" 
-    alt="{{username}}"
-  >
+  <div class="pic">
+    <div id="editPic" >EDITAR</div>
+    <img 
+      src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQopX4_8IGscQTYwpSREOzeW8NHwcArkMkOl3Y1q_EBSiVNCftbvw" 
+      alt="{{username}}"
+    >
+  </div>
   {{/if}}
 
 </section>
@@ -24,15 +31,36 @@
     <br>
     <input value="{{email}}" name="email" type="text">
     <input name="cover" id="fileInput" hidden type="file" accept="image/*">
-    <input type="submit">
+    <input name="photoURL" id="photoInput" hidden type="file" accept="image/*">
   </form>
 </section>
 
 
 <script>
+  //listener para el click
   document
     .getElementById('coverEdit')
     .addEventListener('click', function(){
       document.getElementById('fileInput').click()
   })
+  //listener para DESPUES de seleccionar la imagen
+  document
+    .getElementById('fileInput')
+    .addEventListener('change', function(){
+      document.querySelector('form').submit()
+    })
+
+    //listener for the photourl
+    document
+      .getElementById('editPic')
+      .addEventListener('click', function(){
+        document.getElementById('photoInput').click()
+      })
+    //listener para DESPUES de seleccionar la imagen
+  document
+    .getElementById('photoInput')
+    .addEventListener('change', function(){
+      document.querySelector('form').submit()
+    })
+
 </script>
